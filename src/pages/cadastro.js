@@ -122,11 +122,12 @@ export default function Cadastro() {
                 <FormControl>
                     <FormControl.Label>Função</FormControl.Label>
                 </FormControl>
-                <Box height={"65px"}>
+                <Box height={"65px"} width={'100%'}>
                     <FormControl _invalid={{
                         borderWidth: 2,
                         borderColor: "red.500",
-                    }} isInvalid={'funcao' in errors}>
+                    }} isInvalid={'level' in errors}
+                    >
                         <Controller
                             control={control}
                             name="level"
@@ -137,7 +138,7 @@ export default function Cadastro() {
                                     onChange={(values) => {
                                         onChange(values);
                                     }}
-                                    flexDirection="row"
+                                    flexDirection={'row'}
                                     accessibilityLabel="Escolha se você será aluno ou professor.">
                                     <Radio value="Aluno">
                                         Aluno
@@ -154,7 +155,7 @@ export default function Cadastro() {
                         fontStyle: 'normal',
                         fontSize: 12,
                         fontWeight: 400,
-                    }}>{errors.funcao?.message}</Text>}
+                    }}>{errors.level?.message}</Text>}
                 </Box>
                 <Center>
                     <Button title="CADASTRAR" onPress={handleSubmit(handleSignUp)}></Button>

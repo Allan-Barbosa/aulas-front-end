@@ -13,8 +13,8 @@ const Logo = require('../../assets/aulasLogo.png');
 
 const alterarSenhaEsquema = yup.object({
     email: yup.string().required('Informe o email').email('E-mail inválido'),
-    senha: yup.string().required('Informe a senha').min(8, 'A senha deve ter pelo menos 8 caracteres'),
-    confirmaSenha: yup
+    password: yup.string().required('Informe a senha').min(8, 'A senha deve ter pelo menos 8 caracteres'),
+    samePasswords: yup
     .string()
     .required('Informe a confirmação de senha')
     .oneOf([yup.ref('senha'), null], "A confirmação de senha não é igual.")
@@ -77,11 +77,11 @@ export default function AlterarSenha() {
                 </FormControl>
                 <Controller
                     control={control}
-                    name="senha"
+                    name="password"
                     render={({ field: { onChange } }) => (
                         <Input
                             onChangeText={onChange}
-                            errorMessage={errors.senha?.message}
+                            errorMessage={errors.password?.message}
                             type={show ? "text" : "password"} InputRightElement={<Pressable onPress={() => setShow(!show)}>
                                 <Icon as={<MaterialIcons name={show ? "visibility" : "visibility-off"} />} size={5} mr="2" color="muted.400" />
                             </Pressable>} placeholder="Digite sua senha" />
@@ -92,11 +92,11 @@ export default function AlterarSenha() {
                 </FormControl>
                 <Controller
                     control={control}
-                    name="confirmaSenha"
+                    name="samePasswords"
                     render={({ field: { onChange } }) => (
                         <Input
                             onChangeText={onChange}
-                            errorMessage={errors.confirmaSenha?.message}
+                            errorMessage={errors.samePasswords?.message}
                             type={show ? "text" : "password"} InputRightElement={<Pressable onPress={() => setShow(!show)}>
                                 <Icon as={<MaterialIcons name={show ? "visibility" : "visibility-off"} />} size={5} mr="2" color="muted.400" />
                             </Pressable>} placeholder="Digite sua senha" />

@@ -3,13 +3,14 @@ import { createStackNavigator } from '@react-navigation/stack';
 import index from '../pages'
 import cadastro from '../pages/cadastro'
 import alterarSenha from '../pages/alterarSenha'
+import TabRoutes from './tab.routes';  
 
 const Stack = createStackNavigator();
 
 export default function MyStack() {
     return (
         <Stack.Navigator
-            initialRouteName='index'
+            initialRouteName='turmas1'
             screenOptions={{
                 cardStyle: { backgroundColor: '#FFFFFF' }
             }}
@@ -20,6 +21,10 @@ export default function MyStack() {
                 options={{ headerShown: false }}
                 component={index} />
 
+            <Stack.Screen
+                name="turmas1"
+                options={{ headerShown: false }}
+                component={TabRoutes} />
 
             <Stack.Screen
                 name="cadastro"
