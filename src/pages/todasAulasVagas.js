@@ -8,7 +8,6 @@ import { Input } from '../components/input';
 import { useNavigation } from '@react-navigation/native';
 import { Button } from '../components/button';
 import { Link } from '@react-navigation/native';
-import fetch from 'node-fetch'
 import { SimpleLineIcons, Ionicons  } from '@expo/vector-icons'; 
 const Logo = require('../../assets/aulasLogo.png');
 

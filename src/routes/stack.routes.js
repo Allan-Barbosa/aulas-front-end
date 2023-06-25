@@ -10,7 +10,7 @@ const Stack = createStackNavigator();
 export default function MyStack() {
     return (
         <Stack.Navigator
-            initialRouteName='turmas1'
+            initialRouteName='index'
             screenOptions={{
                 cardStyle: { backgroundColor: '#FFFFFF' }
             }}

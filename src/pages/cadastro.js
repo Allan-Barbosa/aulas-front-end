@@ -8,7 +8,6 @@ import { Input } from '../components/input';
 import { Button } from '../components/button';
 import { useNavigation } from '@react-navigation/native';
 import { Link } from '@react-navigation/native';
-import fetch from 'node-fetch'
 const Logo = require('../../assets/aulasLogo.png');
 
 const signUpSchema = yup.object({
@@ -32,8 +31,9 @@ export default function Cadastro() {
     function handleSignUp(data) {
         enviarDados(data)
         async function enviarDados(dados) {
+            console.log(dados)
             try {
-                const resposta = await fetch('https://api-aulas.onrender.com/api/users/create', {
+                const resposta = await fetch('http://192.168.1.13:3000/api/users/create', {
                     method: 'POST',
                     headers: {
                         Accept: 'application/json',
@@ -41,6 +41,7 @@ export default function Cadastro() {
                     },
                     body: JSON.stringify(dados)
                 })
+                // console.log(resposta)
                 if (resposta.status === 200) {
                     alert('Verifique seu email e clique no link de confirmação, para concluir o cadastro!')
                     console.log(dados)
@@ -50,7 +51,7 @@ export default function Cadastro() {
                     console.log('Erro ao realizar cadastro')
                 }
             } catch (erro) {
-                console.error(erro)
+                console.log(erro)
             }
         }
     }
@@ -160,7 +161,7 @@ export default function Cadastro() {
                 <Center>
                     <Button title="CADASTRAR" onPress={handleSubmit(handleSignUp)}></Button>
                 </Center>
-                <HStack mt="20px" alignItems={'center'} justifyContent={'center'}>
+                <HStack mt="10px" alignItems={'center'} justifyContent={'center'}>
                     <Text color={"#7E8390"} fontSize="13px">Já possuí uma conta?</Text>
                     <Link style={{color: "#0000EE", textDecorationLine: 'underline'}} to={{ screen: 'index'}} ml="5px">Login</Link>
                 </HStack>

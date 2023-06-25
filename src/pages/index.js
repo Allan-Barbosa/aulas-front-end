@@ -8,8 +8,7 @@ import { Input } from '../components/input';
 import { Button } from '../components/button';
 import { useNavigation } from '@react-navigation/native';
 import { Link } from '@react-navigation/native';
-import fetch from 'node-fetch';
-import AsyncStorage from '@react-native-community/async-storage'
+import AsyncStorage from '@react-native-async-storage/async-storage';
 const Logo = require('../../assets/aulasLogo.png');
 
 const signInSchema = yup.object({

@@ -16,7 +16,9 @@ export function Turma({ title, color1, color2, ...rest }) {
   }} p="12" rounded="xl"
   width={375}
   height={160}
-  mt={2}>
+  mt={2}
+  shadow = "9"
+  >
     <Text
       fontSize={'md'}
       fontWeight={'medium'}
