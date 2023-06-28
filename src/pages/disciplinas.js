@@ -7,7 +7,7 @@ import * as yup from 'yup'
 import { Input } from '../components/input';
 import { useNavigation } from '@react-navigation/native';
 import { Link } from '@react-navigation/native';
-import { SimpleLineIcons, Ionicons, AntDesign } from '@expo/vector-icons';
+import { SimpleLineIcons, Ionicons, AntDesign, FontAwesome, Feather } from '@expo/vector-icons';
 import { Turma } from '../components/cardTurma';
 const Logo = require('../../assets/aulasLogo.png');
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -29,7 +29,6 @@ const schemaCode = yup.object().shape({
 });
 
 export default function Turmas() {
-  const [userTurmas, setTurmas] = useState(null);
   const [token, setToken] = useState(null);
   useEffect(() => {
     const getMyStringValue = async () => {
@@ -53,7 +52,6 @@ export default function Turmas() {
   } = useDisclose();
   const [showModalCriar, setShowModalCriar] = useState(false);
   const [showModalEntrar, setShowModalEntrar] = useState(false);
-  const [isLoading, setIsLoading] = useState(true);
   const navigation = useNavigation();
   const { control, handleSubmit, formState: { errors } } = useForm({
     resolver: yupResolver(schema)
@@ -67,16 +65,6 @@ export default function Turmas() {
     resolver: yupResolver(schemaCode),
   });
 
-  const handleCloseModalCriar = () => {
-    setShowModalCriar(false);
-    onClose(); // Fechar o Actionsheet (menu)
-  };
-
-  const handleCloseModalEntrar = () => {
-    setShowModalEntrar(false);
-    onClose(); // Fechar o Actionsheet (menu)
-  };
-
   function criarTurma(data) {
     enviarDados(data)
     async function enviarDados(dados) {
@@ -89,16 +77,13 @@ export default function Turmas() {
           headers: {
             Accept: 'application/json',
             'Content-Type': 'application/json',
-            'authorization': token
           },
           body: JSON.stringify(dados)
         })
-        console.log(resposta)
         if (resposta.status === 200) {
           alert('Turma criada!')
           console.log(dados)
-          buscarTurma()
-          handleCloseModalCriar()
+          navigation.navigate('turmas1')
         } else {
           alert('Nome já existe!')
           console.log('Erro ao criar turma')
@@ -111,20 +96,20 @@ export default function Turmas() {
   function entrarTurma(data) {
     enviarDados(data)
     async function enviarDados(dados) {
+      let obj = { token: token };
       try {
         const resposta = await fetch('https://api-aulas.onrender.com/api/classroom/join/' + dados.codigoTurma, {
           method: 'PATCH',
           headers: {
             Accept: 'application/json',
             'Content-Type': 'application/json',
-            'authorization': token
           },
+          body: JSON.stringify(obj)
         })
         if (resposta.status === 200) {
           alert('Participando da turma!')
           console.log(dados)
-          buscarTurma()
-          handleCloseModalEntrar()
+          navigation.navigate('turmas')
         } else {
           alert('código inválido!')
           console.log('Erro ao entrar na turma')
@@ -134,37 +119,52 @@ export default function Turmas() {
       }
     }
   }
-  async function buscarTurma() {
-    try {
-      const resposta = await fetch('https://api-aulas.onrender.com/api/classroom/show_user_classrooms', {
-        method: 'GET',
-        headers: {
-          Accept: 'application/json',
-          'Content-type': 'application/json',
-          'authorization': token
-        },
-      }
-      )
-      if (resposta.status === 200) {
-        const resp = await resposta.json();
-        setTurmas(resp)
-        console.log(resp)
-        setIsLoading(false)
-      }
-    } catch (error) {
-      alert(error.message)
+  // async function buscarTurma() {
+  //   let obj = { token: token };
+  //   console.log(obj)
+  //   try {
+  //     const resposta = await fetch('https://api-aulas.onrender.com/api/classroom/show_user_classrooms', {
+  //       method: 'GET',
+  //       headers: {
+  //         Accept: 'application/json',
+  //         'Content-type': 'application/json'
+  //       },
+  //       body: JSON.stringify(obj)
+  //     }
+  //     )
+  //     console.log(resposta) 
+  //     if (resposta.status === 200) {
+  //       const resp = await resposta.json();
+  //       console.log(resp)
+  //     }
+  //   } catch (error) {
+  //     alert(error.message)
+  //   }
+  // }
+  // buscarTurma()
+  
+  const turmas = [
+    {
+      "id": "64854250af8ca4472e0f17ee",
+      "name": "ADS 5",
+      "code": "YP5EF6PUOI"
+    },
+    {
+      "id": "6499cb4700233fd41a2ad481",
+      "name": "Teste",
+      "code": "G3PFBPEQCO"
+    },
+    {
+      "id": "6499da367dae754d3707dc46",
+      "name": "ADS 8",
+      "code": "GQK608C99B"
+    },
+    {
+      "id": "649a2fdf4eac558eb8954397",
+      "name": "Teste Rota Online",
+      "code": "83FOUX3GYR"
     }
-  }
-  if (userTurmas == null){
-    buscarTurma()
-  }
-  if (isLoading) {
-    // Renderizar indicador de carregamento ou null enquanto o valor está sendo buscado
-    return null;
-  }
-  console.log(userTurmas)
-  console.log(token)
-  const turmas = userTurmas
+  ]
 
   const colors = [
     "red.400",
@@ -188,10 +188,10 @@ export default function Turmas() {
   return (
     <VStack config={config} safeArea flex={1}>
       <Box borderBottomWidth={'1px'} flexDirection={'row'} justifyContent={'space-around'} alignItems={'center'} h="89.8px" borderBottomColor='#D8D8D8'>
-        <SimpleLineIcons
+        <Feather
           onPress={() => {
             removeFew = async () => {
-              const keys = ['token', 'level', 'acesso', 'name', 'id', 'email']
+              const keys = ['turma-code', 'turma-id', 'turm-name']
               try {
                 await AsyncStorage.multiRemove(keys)
               } catch (e) {
@@ -201,9 +201,9 @@ export default function Turmas() {
               console.log('Done')
             }
             removeFew()
-            navigation.navigate('index')
+            navigation.navigate('turmas1')
           }}
-          name="logout" size={30} color="black" />
+          name="arrow-left-circle" size={30} color="black" />
         <Box flexDirection={'row'} alignItems={'center'}>
           <Image size="59px" borderRadius={119} source={Logo} alt="Logo do aplicativo" />
           <Text ml='5px' fontSize='20px' fontWeight='normal' color='#1C1C1E' fontFamily='sans-serif-medium'>AULAS</Text>
@@ -211,65 +211,18 @@ export default function Turmas() {
         <Ionicons name="notifications-circle-outline" size={34} color="black" />
       </Box>
       <ScrollView>
-        {turmas.length === 0 ? (
-          <Center><Text mt={200} fontSize={30} color={'gray.400'}>Não há turmas carregadas.</Text></Center>
-        ) : (
-          turmas.map((turma, index) => (
-            <Turma
-              key={index}
-              color1={colors[index % colors.length]}
-              color2={colors2[(index) % colors.length]}
-              title={turma.name}
-              onPress={() => {
-                console.log(turma)
-                const _storeData = async (turma) => {
-                  try {
-                    await AsyncStorage.setItem(
-                      'turma-code',
-                      turma.code,
-                    );
-                    await AsyncStorage.setItem(
-                      'turma-id',
-                      turma.id,
-                    );
-                    await AsyncStorage.setItem(
-                      'turma-name',
-                      turma.name,
-                    );
-                  } catch (error) {
-                    console.log(error)
-                    // Error saving data
-                  }
-                }
-                // const _retrieveData = async () => {
-                //   try {
-                //     let value = await AsyncStorage.getItem('turma-id');
-                //     if (value !== null) {
-                //       // We have data!!
-                //       console.log(value);
-                //     }
-                //     value = await AsyncStorage.getItem('turma-code');
-                //     if (value !== null) {
-                //       // We have data!!
-                //       console.log(value);
-                //     }
-                //     value = await AsyncStorage.getItem('turma-name');
-                //     if (value !== null) {
-                //       // We have data!!
-                //       console.log(value);
-                //     }
-                //   } catch (error) {
-                //     console.log(error)
-                //     // Error retrieving data
-                //   }
-                // }
-                _storeData(turma)
-                // _retrieveData()
-                navigation.navigate('turmas2')
-              }}
-            />
-          ))
-        )}
+      {turmas.length === 0 ? (
+        <Center><Text mt={200} fontSize={30} color={'gray.400'}>Não há turmas carregadas.</Text></Center>
+      ) : (
+        turmas.map((turma, index) => (
+          <Turma
+            key={index}
+            color1={colors[index % colors.length]}
+            color2={colors2[(index ) % colors.length]}
+            title={turma.name}
+          />
+        ))
+      )}
       </ScrollView>
       <AntDesign onPress={onOpen} right={20} bottom={20} position={'absolute'} name="pluscircle" size={60} color="#0891b2" />
       <Actionsheet isOpen={isOpen} onClose={onClose}>
@@ -288,7 +241,7 @@ export default function Turmas() {
           </Actionsheet.Item>
         </Actionsheet.Content>
       </Actionsheet>
-      <Modal isOpen={showModalCriar} onClose={() => handleCloseModalCriar()}>
+      <Modal isOpen={showModalCriar} onClose={() => setShowModalCriar(false)}>
         <Modal.Content maxWidth="400px">
           <Modal.CloseButton />
           <Modal.Header>Criar turma</Modal.Header>
@@ -314,7 +267,9 @@ export default function Turmas() {
           </Modal.Body>
           <Modal.Footer>
             <Button.Group space={2}>
-              <Button variant="ghost" colorScheme="blueGray" onPress={handleCloseModalCriar}>
+              <Button variant="ghost" colorScheme="blueGray" onPress={() => {
+                setShowModalCriar(false);
+              }}>
                 Cancel
               </Button>
               <Button onPress={handleSubmit(criarTurma)}>
@@ -325,7 +280,7 @@ export default function Turmas() {
           </Modal.Footer>
         </Modal.Content>
       </Modal>
-      <Modal isOpen={showModalEntrar} onClose={() => handleCloseModalEntrar()}>
+      <Modal isOpen={showModalEntrar} onClose={() => setShowModalEntrar(false)}>
         <Modal.Content maxWidth="400px">
           <Modal.CloseButton />
           <Modal.Header>Entrar em turma</Modal.Header>
@@ -350,7 +305,9 @@ export default function Turmas() {
           </Modal.Body>
           <Modal.Footer>
             <Button.Group space={2}>
-              <Button variant="ghost" colorScheme="blueGray" onPress={handleCloseModalEntrar}>
+              <Button variant="ghost" colorScheme="blueGray" onPress={() => {
+                setShowModalEntrar(false);
+              }}>
                 Cancel
               </Button>
               <Button onPress={handleSubmitCode(entrarTurma)}>

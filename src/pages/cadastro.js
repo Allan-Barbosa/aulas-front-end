@@ -33,7 +33,7 @@ export default function Cadastro() {
         async function enviarDados(dados) {
             console.log(dados)
             try {
-                const resposta = await fetch('http://192.168.1.13:3000/api/users/create', {
+                const resposta = await fetch('https://api-aulas.onrender.com/api/users/create', {
                     method: 'POST',
                     headers: {
                         Accept: 'application/json',

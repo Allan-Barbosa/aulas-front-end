@@ -13,7 +13,7 @@ const Logo = require('../../assets/aulasLogo.png');
 
 const signInSchema = yup.object({
     email: yup.string().required('Informe o email').email('E-mail inválido'),
-    senha: yup.string().required('Informe a senha').min(8, 'A senha deve ter pelo menos 8 caracteres'),
+    password: yup.string().required('Informe a senha').min(8, 'A senha deve ter pelo menos 8 caracteres'),
 });
 
 export default function Login() {
@@ -23,26 +23,38 @@ export default function Login() {
     const navigation = useNavigation();
     const [show, setShow] = React.useState(false);
     function handleSignIn(data) {
-        _storeData = async () => {
+        const _storeData = async (respData) => {
             try {
                 await AsyncStorage.setItem(
                     'token',
-                    'token',
+                    respData.token,
                 );
                 await AsyncStorage.setItem(
                     'level',
-                    'professor',
+                    respData.level,
                 );
                 await AsyncStorage.setItem(
                     'acesso',
                     'true',
+                );
+                await AsyncStorage.setItem(
+                    'name',
+                    respData.name,
+                );
+                await AsyncStorage.setItem(
+                    'id',
+                    respData.id,
+                );
+                await AsyncStorage.setItem(
+                    'email',
+                    respData.email,
                 );
             } catch (error) {
                 console.log(error)
                 // Error saving data
             }
         }
-        _retrieveData = async () => {
+        const _retrieveData = async () => {
             try {
                 let value = await AsyncStorage.getItem('token');
                 if (value !== null) {
@@ -59,87 +71,54 @@ export default function Login() {
                     // We have data!!
                     console.log(value);
                 }
+                value = await AsyncStorage.getItem('name');
+                if (value !== null) {
+                    // We have data!!
+                    console.log(value);
+                }
+                value = await AsyncStorage.getItem('id');
+                if (value !== null) {
+                    // We have data!!
+                    console.log(value);
+                }
+                value = await AsyncStorage.getItem('email');
+                if (value !== null) {
+                    // We have data!!
+                    console.log(value);
+                }
             } catch (error) {
+                console.log(error)
                 // Error retrieving data
             }
         };
-        _storeData()
-        _retrieveData()
-        navigation.navigate('turmas')
-        // enviarDados(data)
-        // async function enviarDados(dados) {
-        //     try {
-        //         const resposta = await fetch('', {
-        //             method: 'POST',
-        //             headers: {
-        //                 Accept: 'application/json',
-        //                 'Content-type': 'application/json'
-        //             },
-        //             body: JSON.stringify(dados)
-        //         }
-        //         )
-        //         if (resposta.status === 200) {
-        //             _storeData = async (token, level) => {
-        //                 try {
-        //                     await AsyncStorage.setItem(
-        //                         'token',
-        //                         JSON.stringify(token),
-        //                     );
-        //                     await AsyncStorage.setItem(
-        //                         'level',
-        //                         level,
-        //                     );
-        //                     await AsyncStorage.setItem(
-        //                         'acesso',
-        //                         'true',
-        //                     );
-        //                 } catch (error) {
-        //                     console.log(error)
-        //                     // Error saving data
-        //                 }
-        //             }
-        //             _retrieveData = async () => {
-        //                 try {
-        //                     let value = await AsyncStorage.getItem('token');
-        //                     if (value !== null) {
-        //                         // We have data!!
-        //                         console.log(value);
-        //                     }
-        //                     value = await AsyncStorage.getItem('level');
-        //                     if (value !== null) {
-        //                         // We have data!!
-        //                         console.log(value);
-        //                     }
-        //                     value = await AsyncStorage.getItem('acesso');
-        //                     if (value !== null) {
-        //                         // We have data!!
-        //                         console.log(value);
-        //                     }
-        //                 } catch (error) {
-        //                     // Error retrieving data
-        //                 }
-        //             };
-        //             if (resposta.body.level === 'Aluno') {
-        //                 const resposta = await resp.json();
-        //                 const token = await JSON.parse(atob(resposta.token.split('.')[1]));
-        //                 _storeData(token, resposta.level)
-        //                 _retrieveData()
-
-        //             } else if (resposta.body.level === 'Aluno') {
-        //                 const resposta = await resposta.json();
-        //                 AsyncStorage.clear()
-        //                 const token = await JSON.parse(atob(resposta.token.split('.')[1]));
-        //                 _storeData(token, resposta.level)
-        //                 _retrieveData()
-        //                 navigation.navigate('turmas')
-        //             }
-        //         } else {
-        //             alert("Dados incorretos!")
-        //         }
-        //     } catch (error) {
-        //         alert(error.message)
-        //     }
-        // }
+        enviarDados(data)
+        async function enviarDados(dados) {
+            try {
+                const resposta = await fetch('https://api-aulas.onrender.com/api/user/session', {
+                    method: 'POST',
+                    headers: {
+                        Accept: 'application/json',
+                        'Content-type': 'application/json'
+                    },
+                    body: JSON.stringify(dados)
+                }
+                )
+                if (resposta.status === 200) {
+                    const resp = await resposta.json();
+                    _storeData(resp)
+                    _retrieveData()
+                    alert("Login realizado com sucesso!")
+                    setTimeout(function() {
+                        console.log('3 segundos');
+                      }, 3000)
+                      navigation.navigate('turmas1')
+                } else {
+                    alert("Dados incorretos!")
+                }
+            } catch (error) {
+                alert(error.message)
+            }
+        }
     }
     return (
         <VStack justifyContent={"center"} flex={1} px={10} safeArea>
@@ -165,11 +144,11 @@ export default function Login() {
             </FormControl>
             <Controller
                 control={control}
-                name="senha"
+                name="password"
                 render={({ field: { onChange } }) => (
                     <Input
                         onChangeText={onChange}
-                        errorMessage={errors.senha?.message}
+                        errorMessage={errors.password?.message}
                         type={show ? "text" : "password"} InputRightElement={<Pressable onPress={() => setShow(!show)}>
                             <Icon as={<MaterialIcons name={show ? "visibility" : "visibility-off"} />} size={5} mr="2" color="muted.400" />
                         </Pressable>} placeholder="Digite sua senha" />
