@@ -31,7 +31,7 @@ export default function MyTab() {
             />
 
             <tab.Screen
-                name="aulas substituidas"
+                name="disciplinas"
                 component={disciplinas}
                 options={{
                     headerShown: false,

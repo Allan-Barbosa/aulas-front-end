@@ -8,7 +8,7 @@ import { Input } from '../components/input';
 import { useNavigation } from '@react-navigation/native';
 import { Link } from '@react-navigation/native';
 import { SimpleLineIcons, Ionicons, AntDesign, FontAwesome5, Feather } from '@expo/vector-icons';
-import { Turma } from '../components/cardTurma';
+import { Turma } from '../components/cardAulaVaga';
 const Logo = require('../../assets/aulasLogo.png');
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
@@ -27,10 +27,13 @@ const schema = yup.object().shape({
 
 export default function Turmas() {
   const [token, setToken] = useState(null);
+  const [userID, setUserID] = useState(null);
+  const [turmaName, setTurmaName] = useState(null);
   const [showModal, setShowModal] = useState(false);
   const [turmaCode, setCode] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
   const [aulasvagas, setAulasVagas] = useState(null);
+
   useEffect(() => {
     const getMyStringValue = async () => {
       try {
@@ -42,6 +45,14 @@ export default function Turmas() {
         if (value !== null) {
           setCode(value);
         }
+        value = await AsyncStorage.getItem('turma-name');
+        if (value !== null) {
+          setTurmaName(value);
+        }
+        value = await AsyncStorage.getItem('id');
+        if (value !== null) {
+          setUserID(value);
+        }
       } catch (error) {
         // Error reading data
       }
@@ -52,9 +63,10 @@ export default function Turmas() {
   const { control, handleSubmit, formState: { errors } } = useForm({
     resolver: yupResolver(schema)
   });
-  async function buscarAulasVagas() {
+ async function buscarAulasVagas() {
     try {
-      const resposta = await fetch('https://api-aulas.onrender.com/api/classroom/get_dates/YP5EF6PUOI' + turmaCode, {
+      console.log('dentro')
+      const resposta = await fetch('https://api-aulas.onrender.com/api/classroom/get_dates/' + turmaCode, {
         method: 'GET',
         headers: {
           Accept: 'application/json',
@@ -76,7 +88,7 @@ export default function Turmas() {
   function cadastrarAulaVaga(data) {
     enviarDados(data)
     async function enviarDados(dados) {
-      console.log(token)
+      // console.log(token)
       dados["code"] = turmaCode;
       console.log(dados)
       try {
@@ -89,11 +101,12 @@ export default function Turmas() {
           },
           body: JSON.stringify(dados)
         })
-        console.log(resposta)
+        // console.log(resposta)
         if (resposta.status === 200) {
           alert('Aula vaga cadastrada!')
-          console.log(dados)
+          // console.log(dados)
           buscarAulasVagas()
+          console.log(aulasvagas)
           setShowModal(false)
         } else {
           alert('erro ao cadastar aula vaga!')
@@ -107,17 +120,36 @@ export default function Turmas() {
   if (aulasvagas == null) {
     buscarAulasVagas()
   }
-//   if (isLoading) {
-//     // Renderizar indicador de carregamento ou null enquanto o valor está sendo buscado
-//     return null;
-// }
+  if (isLoading) {
+    // Renderizar indicador de carregamento ou null enquanto o valor está sendo buscado
+    return null;
+}
+const colors = [
+  "red.400",
+  "blue.400",
+  "green.400",
+  "yellow.400",
+  "violet.400",
+  "orange.400",
+  "teal.400",
+];
+
+const colors2 = [
+  "red.700",
+  "blue.700",
+  "green.700",
+  "yellow.700",
+  "violet.700",
+  "orange.700",
+  "teal.700",
+];
   return (
     <VStack config={config} safeArea flex={1}>
       <Box borderBottomWidth={'1px'} flexDirection={'row'} justifyContent={'space-around'} alignItems={'center'} h="89.8px" borderBottomColor='#D8D8D8'>
         <Feather
           onPress={() => {
             removeFew = async () => {
-              const keys = ['turma-code', 'turma-id', 'turm-name']
+              const keys = ['turma-code', 'id', 'turm-name']
               try {
                 await AsyncStorage.multiRemove(keys)
               } catch (e) {
@@ -137,9 +169,24 @@ export default function Turmas() {
         <Ionicons name="notifications-circle-outline" size={34} color="black" />
       </Box>
       <ScrollView>
-      {/* {turmas.map((turma, index) => (
-          <Turma key={index} color1={turma.color1} color2={turma.color2} title={turma.title} />
-        ))} */}
+        <Center>
+      <Text my={5} fontSize={20} color='gray.500' fontWeight="semibold">Código da turma: {turmaCode}</Text>
+      </Center>
+      {aulasvagas.map((aulavaga, index) => (
+          aulavaga.substituteTeacherId === null && aulavaga.dateCreatedById !== userID ? (
+            <Turma
+              key={index}
+              title={turmaName}
+              date={aulavaga.date}
+              description={aulavaga.description}
+              id = {aulavaga.id}
+              color1="green.400"
+              color2="violet.700"
+              token = {token}
+              code = {turmaCode}
+            />
+          ) : null
+        ))}
       </ScrollView>
       <AntDesign onPress={() => setShowModal(true)} right={20} bottom={20} position={'absolute'} name="pluscircle" size={60} color="#0891b2" />
       <Modal isOpen={showModal} onClose={() => setShowModal(false)}>
@@ -161,6 +208,9 @@ export default function Turmas() {
                   onChangeText={onChange} />
               )}
             />
+            <FormControl name="horário">
+              <FormControl.Label>horário</FormControl.Label>
+            </FormControl>
             <Controller
               control={control}
               name="description"
@@ -180,7 +230,7 @@ export default function Turmas() {
                 Cancel
               </Button>
               <Button onPress={handleSubmit(cadastrarAulaVaga)}>
-                Criar
+                Cadastrar
               </Button>
 
             </Button.Group>

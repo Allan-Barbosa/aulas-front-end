@@ -31,6 +31,15 @@ const schemaCode = yup.object().shape({
 export default function Turmas() {
   const [userTurmas, setTurmas] = useState(null);
   const [token, setToken] = useState(null);
+  const [hasLoadedTurmas, setHasLoadedTurmas] = useState(false);
+
+  useEffect(() => {
+    if (!hasLoadedTurmas) {
+      buscarTurma();
+      setHasLoadedTurmas(true);
+    }
+  }, [hasLoadedTurmas]);
+
   useEffect(() => {
     const getMyStringValue = async () => {
       try {
@@ -42,7 +51,6 @@ export default function Turmas() {
         // Error reading data
       }
     };
-
     getMyStringValue();
   }, []);
 
@@ -80,9 +88,7 @@ export default function Turmas() {
   function criarTurma(data) {
     enviarDados(data)
     async function enviarDados(dados) {
-      console.log(token)
       dados["token"] = token;
-      console.log(dados)
       try {
         const resposta = await fetch('https://api-aulas.onrender.com/api/classroom/create', {
           method: 'POST',
@@ -93,10 +99,8 @@ export default function Turmas() {
           },
           body: JSON.stringify(dados)
         })
-        console.log(resposta)
         if (resposta.status === 200) {
           alert('Turma criada!')
-          console.log(dados)
           buscarTurma()
           handleCloseModalCriar()
         } else {
@@ -122,7 +126,6 @@ export default function Turmas() {
         })
         if (resposta.status === 200) {
           alert('Participando da turma!')
-          console.log(dados)
           buscarTurma()
           handleCloseModalEntrar()
         } else {
@@ -148,22 +151,20 @@ export default function Turmas() {
       if (resposta.status === 200) {
         const resp = await resposta.json();
         setTurmas(resp)
-        console.log(resp)
         setIsLoading(false)
       }
     } catch (error) {
       alert(error.message)
     }
   }
-  if (userTurmas == null){
+  if (userTurmas == null) {
     buscarTurma()
   }
   if (isLoading) {
     // Renderizar indicador de carregamento ou null enquanto o valor está sendo buscado
     return null;
   }
-  console.log(userTurmas)
-  console.log(token)
+ 
   const turmas = userTurmas
 
   const colors = [
@@ -221,7 +222,6 @@ export default function Turmas() {
               color2={colors2[(index) % colors.length]}
               title={turma.name}
               onPress={() => {
-                console.log(turma)
                 const _storeData = async (turma) => {
                   try {
                     await AsyncStorage.setItem(

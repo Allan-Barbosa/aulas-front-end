@@ -3,6 +3,8 @@ import { createStackNavigator } from '@react-navigation/stack';
 import React, { useEffect, useState } from 'react';
 import index from '../pages'
 import cadastro from '../pages/cadastro'
+import turmas1 from '../pages/turmas'
+import turmas2 from '../pages/aulasVagas'
 import alterarSenha from '../pages/alterarSenha'
 import TabRoutes from './tab.routes';
 import TabRoutesTurma from './tab.routesTurma';
@@ -39,12 +41,10 @@ export default function MyStack() {
         // Renderizar indicador de carregamento ou null enquanto o valor está sendo buscado
         return null;
     }
-
-    console.log(initialRoute)
     return (
         <Stack.Navigator
-        // initialRouteName={initialRoute}
-        initialRouteName= 'index'
+        initialRouteName={initialRoute}
+        // initialRouteName= 'index'
             screenOptions={{
                 cardStyle: { backgroundColor: '#FFFFFF' }
             }}
@@ -58,7 +58,7 @@ export default function MyStack() {
             <Stack.Screen
                 name="turmas1"
                 options={{ headerShown: false }}
-                component={TabRoutes} />
+                component={turmas1} />
 
 
             <Stack.Screen
